@@ -13,4 +13,4 @@ Known bugs:
 
 
 Future plans:
-    Add genetic ai to train a neural networks for automatic playing
+    Add genetic algorithm to train a neural networks for automatic playing
