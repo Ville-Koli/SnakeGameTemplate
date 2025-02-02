@@ -14,3 +14,7 @@ Known bugs:
 
 Future plans:
     Add genetic algorithm to train a neural networks for automatic playing
+    Clean code and add comments
+    Optimize code
+    Make the game look visually better
+    Improve main menu ui
