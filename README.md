@@ -13,8 +13,8 @@ Known bugs:
 
 
 Future plans:
-    Add genetic algorithm to train a neural networks for automatic playing
-    Clean code and add comments
-    Optimize code
-    Make the game look visually better
-    Improve main menu ui
+    1. Add genetic algorithm to train a neural networks for automatic playing
+    2. Clean code and add comments
+    3. Optimize code
+    4. Make the game look visually better
+    5. Improve main menu ui
