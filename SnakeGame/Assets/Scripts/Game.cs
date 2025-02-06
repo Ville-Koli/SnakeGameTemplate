@@ -11,7 +11,7 @@ public class Game : MonoBehaviour
     private GameObject _snakeHead;
     public Texture2D snakeTexture;
     public Texture2D borderTexture;
-    private Vector3 _directionVector = new Vector2(0, 1);
+    public Vector3 _directionVector = new Vector2(0, 1);
     public float speed = 1;
     public float snakeSize;
     private Dictionary<string, Func<bool>> _inputs = new Dictionary<string, Func<bool>>();
@@ -107,16 +107,16 @@ public class Game : MonoBehaviour
         size = sr.bounds.size;
         // set input system
         _inputs.Add("", () => {return true;}); // default action
-        _inputs.Add("w", () => {_directionVector = new Vector2(0, 1) * sr.bounds.size.y; return true;});
-        _inputs.Add("s", () => {_directionVector = new Vector2(0, -1) * sr.bounds.size.y; return true;});
-        _inputs.Add("a", () => {_directionVector = new Vector2(-1, 0) * sr.bounds.size.x; return true;});
-        _inputs.Add("d", () => {_directionVector = new Vector2(1, 0) * sr.bounds.size.x; return true;});
+        _inputs.Add("w", () => {_directionVector = new Vector2(0, 1) * size.y; return true;});
+        _inputs.Add("s", () => {_directionVector = new Vector2(0, -1) * size.y; return true;});
+        _inputs.Add("a", () => {_directionVector = new Vector2(-1, 0) * size.x; return true;});
+        _inputs.Add("d", () => {_directionVector = new Vector2(1, 0) * size.x; return true;});
         _directionVector = new Vector2(1, 0) * sr.bounds.size.x; // set to be default direction
         // calculate real bounds
-        bounds.x = bounds.x * size.x;
-        bounds.y = bounds.y * size.y;
-        bounds.z = bounds.z * size.x;
-        bounds.w = bounds.w * size.y;
+        bounds.x *= size.x;
+        bounds.y *= size.y;
+        bounds.z *= size.x;
+        bounds.w *= size.y;
         // generate borders
         MakeGameBorders(bounds, 0.3f, 4f);
         // set snake location

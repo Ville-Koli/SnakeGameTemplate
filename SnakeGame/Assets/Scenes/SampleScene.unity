@@ -697,9 +697,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   snakeTexture: {fileID: 10910, guid: 0000000000000000f000000000000000, type: 0}
   borderTexture: {fileID: 10904, guid: 0000000000000000f000000000000000, type: 0}
+  _directionVector: {x: 0, y: 1, z: 0}
   speed: 1
   snakeSize: 1
-  bounds: {x: 20, y: 0, z: 40, w: 20}
+  bounds: {x: 20, y: 0, z: 60, w: 20}
   updateTimer: 0.3
   size: {x: 0, y: 0, z: 0}
   spawner: {fileID: 752799951}
@@ -1403,7 +1404,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 2
-  m_Size: {x: 100, y: 100}
+  m_Size: {x: 500, y: 500}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1

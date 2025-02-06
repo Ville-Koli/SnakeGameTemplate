@@ -20,11 +20,13 @@ public class FoodSpawner : MonoBehaviour
         sr.sprite = Sprite.Create(food_texture, new Rect(0, 0, food_texture.width, food_texture.height), new Vector2(0.5f, 0.5f));
 
         space = new Vector3(
-        UnityEngine.Random.Range(1, (int)MathF.Abs(game.bounds.z - game.bounds.x)) * game.size.x * game.speed, 
-        UnityEngine.Random.Range(1, (int)MathF.Abs(game.bounds.w - game.bounds.y)) * game.size.y * game.speed);
+        UnityEngine.Random.Range(1, (int)MathF.Abs(game.bounds.z - game.bounds.x)) + game.bounds.x, 
+        UnityEngine.Random.Range(1, (int)MathF.Abs(game.bounds.w - game.bounds.y)) + game.bounds.y)/ (game.size.x * game.speed);
 
-        current_food.transform.position = space
-        + new Vector3(game.bounds.x, game.bounds.y);
+        space.x = ((int) space.x) * game.size.x * game.speed;
+        space.y = ((int) space.y) * game.size.y * game.speed;
+
+        current_food.transform.position = space;
         sr.material.color = Color.red;
     }
     // Start is called once before the first execution of Update after the MonoBehaviour is created
