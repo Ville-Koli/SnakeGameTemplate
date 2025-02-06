@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 
@@ -13,7 +14,7 @@ public class Game : MonoBehaviour
     private Vector3 _directionVector = new Vector2(0, 1);
     public float speed = 1;
     public float snakeSize;
-    private List<(KeyCode key, Func<bool> func)> _inputs = new List<(KeyCode, Func<bool>)>();
+    private Dictionary<string, Func<bool>> _inputs = new Dictionary<string, Func<bool>>();
     public Vector4 bounds = new Vector4(0, 0, 10, 10);
     public float updateTimer = 0f;
     private float totalTimer = 0f;
@@ -63,26 +64,31 @@ public class Game : MonoBehaviour
     /**
     <summary> Function, which generates the borders for the snake game. </summary>
     **/
-    void MakeGameBorders(float sizeT, float offset, float scalar){
+    void MakeGameBorders(Vector4 sizeT, float offset, float scalar){
         // Create the first border
         GameObject borderX = new GameObject();
-        sizeT += offset;
-        sizeT *= scalar;
+        // FIX THIS SHIT
+        Vector2 diff = new Vector4(sizeT.z - sizeT.x, sizeT.w - sizeT.y);
         SpriteRenderer sr = borderX.AddComponent<SpriteRenderer>();
         sr.sortingOrder = 3;
         sr.sprite = Sprite.Create(borderTexture, new Rect(0, 0, borderTexture.width, borderTexture.height), new Vector2(0.5f, 0.5f));
         sr.material.color = Color.black;
-        borderX.transform.localScale = new Vector3(sizeT, 1, 1);
-        borderX.transform.position = new Vector3(bounds.x * size.x + bounds.z * size.x/2, bounds.w * size.y + offset);
+        borderX.transform.localScale = new Vector3(diff.x * scalar, 1, 1);
+        borderX.transform.position = new Vector3(bounds.x + diff.x/2, bounds.w + offset);
         // then we copy said border and edit its position and scale for the other borders
         GameObject borderX2 = Instantiate(borderX);
-        borderX2.transform.position = new Vector3(bounds.x * size.x + bounds.z * size.x/2, bounds.y * size.y - offset);
+        borderX2.transform.position = new Vector3(bounds.x + diff.x/2, bounds.y - offset);
+        
         GameObject borderY1 = Instantiate(borderX);
-        borderY1.transform.position = new Vector3(bounds.x * size.x - offset, bounds.y * size.y + bounds.w * size.y/2);
-        borderY1.transform.localScale = new Vector3(1, sizeT, 1);
+        borderY1.transform.position = new Vector3(bounds.x - offset, bounds.y + diff.y/2);
+        borderY1.transform.localScale = new Vector3(1, diff.y * scalar, 1);
         GameObject borderY2 = Instantiate(borderX);
-        borderY2.transform.position = new Vector3(bounds.z * size.x + offset, bounds.y * size.y + bounds.w * size.y/2);
-        borderY2.transform.localScale = new Vector3(1, sizeT, 1);
+        borderY2.transform.position = new Vector3(bounds.z + offset, bounds.y + diff.y/2);
+        borderY2.transform.localScale = new Vector3(1, diff.y * scalar, 1);
+    }
+    /** <summary> Function, which manually calls an input </summary> **/
+    public void CallInput(string keyCode){
+        _inputs[keyCode]();
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -99,19 +105,20 @@ public class Game : MonoBehaviour
         _snakeHead.transform.localScale = new Vector3(1,1,1)*snakeSize;
         sr.sortingOrder = 1;
         size = sr.bounds.size;
-        // generate borders
-        MakeGameBorders(bounds.w, 0.3f, 4);
         // set input system
-        _inputs.Add((KeyCode.W, () => {_directionVector = new Vector2(0, 1) * sr.bounds.size.y; return true;}));
-        _inputs.Add((KeyCode.S, () => {_directionVector = new Vector2(0, -1) * sr.bounds.size.y; return true;}));
-        _inputs.Add((KeyCode.A, () => {_directionVector = new Vector2(-1, 0) * sr.bounds.size.x; return true;}));
-        _inputs.Add((KeyCode.D, () => {_directionVector = new Vector2(1, 0) * sr.bounds.size.x; return true;}));
-        _directionVector = new Vector2(1, 0) * sr.bounds.size.x;
+        _inputs.Add("", () => {return true;}); // default action
+        _inputs.Add("w", () => {_directionVector = new Vector2(0, 1) * sr.bounds.size.y; return true;});
+        _inputs.Add("s", () => {_directionVector = new Vector2(0, -1) * sr.bounds.size.y; return true;});
+        _inputs.Add("a", () => {_directionVector = new Vector2(-1, 0) * sr.bounds.size.x; return true;});
+        _inputs.Add("d", () => {_directionVector = new Vector2(1, 0) * sr.bounds.size.x; return true;});
+        _directionVector = new Vector2(1, 0) * sr.bounds.size.x; // set to be default direction
         // calculate real bounds
         bounds.x = bounds.x * size.x;
         bounds.y = bounds.y * size.y;
         bounds.z = bounds.z * size.x;
         bounds.w = bounds.w * size.y;
+        // generate borders
+        MakeGameBorders(bounds, 0.3f, 4f);
         // set snake location
         _snakeHead.transform.position = new Vector3(bounds.x, bounds.y);
         // fetch best highscore
@@ -121,7 +128,7 @@ public class Game : MonoBehaviour
             using(StreamReader streamReader = new StreamReader(path)){
                 bool didParse = int.TryParse(streamReader.ReadLine(), out int result);
                 highScore = result;
-                highScoreText.text = "High Score: " + highScore;
+                highScoreText.text = highScore.ToString();
             }
         }
     }
@@ -133,16 +140,13 @@ public class Game : MonoBehaviour
             // set current highscore
             if(_snakeBody.Count > highScore){
                 highScore = _snakeBody.Count;
-                highScoreText.text = "High Score: " + highScore;
+                highScoreText.text = highScore.ToString();
             }
             return;
         } 
-
         totalTimer += Time.deltaTime;
         // input system
-        foreach(var input in _inputs)
-            if(Input.GetKeyDown(input.key))
-                input.func();
+        _inputs[Input.inputString]();
         // update snake
         if(totalTimer > updateTimer){
             UpdateSnake(out isGameRunning);
@@ -153,7 +157,7 @@ public class Game : MonoBehaviour
             GenerateSnakeBody();
             Destroy(spawner.current_food);
             spawner.GenerateFood();
-            scoreText.text = "Current Score: " + _snakeBody.Count;
+            scoreText.text = _snakeBody.Count.ToString();
         }
     }
 }
