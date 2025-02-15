@@ -3,6 +3,16 @@ using UnityEngine;
 public class BorderGenerator : MonoBehaviour
 {
     [SerializeField] private Texture2D borderTexture;
+    [SerializeField] private Game game;
+    /**
+    <summary> Function, which makes a border element from given information
+    </summary>
+    <param name = "loc"> location of border element </param>
+    <param name = "scale"> scale of border element </param> 
+    <param name = "name"> name of border element </param> 
+    <param name = "parent"> parent of border element </param> 
+    <returns> GameObject, which is the border element </returns>
+    **/
     GameObject MakeBorderElement(Vector3 loc, Vector3 scale, string name, GameObject parent){
         GameObject border = new GameObject();
         SpriteRenderer sr = border.AddComponent<SpriteRenderer>();
@@ -15,6 +25,15 @@ public class BorderGenerator : MonoBehaviour
         border.transform.SetParent(parent.transform);
         return border;
     }
+    /**
+    <summary> Function, which makes a border element from already given border element.</summary>
+    <param name = "inst"> given game object from, which border object is based upon </param>
+    <param name = "loc"> location of border element </param>
+    <param name = "scale"> scale of border element </param> 
+    <param name = "name"> name of border element </param> 
+    <param name = "parent"> parent of border element </param> 
+    <returns> GameObject, which is formed from inst </returns>
+    **/
     GameObject MakeBorderElement(GameObject inst, Vector3 loc, Vector3 scale, string name, GameObject parent){
         GameObject border = Instantiate(inst);
         border.name = name;
@@ -25,6 +44,10 @@ public class BorderGenerator : MonoBehaviour
     }
     /**
     <summary> Function, which generates the borders for the snake game. </summary>
+    <param name = "bounds"> bounds, which the borders surround </param>
+    <param name = "offset"> added offset to all borders </param>
+    <param name = "scalar"> multiplying constant to borders </param> 
+    <param name = "parent"> parent of all borders </param> 
     **/
     public void MakeGameBorders(Vector4 bounds, float offset, float scalar, GameObject parent){
         Vector2 diff = new Vector4(bounds.z - bounds.x, bounds.w - bounds.y);
@@ -43,7 +66,10 @@ public class BorderGenerator : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-
+        // make sure that bounds have been calculated
+        game.Start();
+        // generate borders
+        MakeGameBorders(game.Bounds, 0.3f, 4f, game.GetParentObject());
     }
 
     // Update is called once per frame

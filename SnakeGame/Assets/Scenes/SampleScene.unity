@@ -243,9 +243,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   snakeGamePrefab: {fileID: 752799948}
-  amount: 10
+  amount: 0
   size: 30
-  rowMax: 100
+  rowMax: 10
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -714,11 +714,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   snake: {fileID: 752799953}
-  Bounds: {x: 0, y: 0, z: 20, w: 20}
+  Bounds: {x: 0, y: 0, z: 10, w: 10}
   updateTimer: 0.3
-  totalTimer: 0
   isGameRunning: 1
-  highScore: 0
   scoreText: {fileID: 1260226480}
   highScoreText: {fileID: 647397256}
   spawner: {fileID: 752799951}
@@ -753,7 +751,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   food_texture: {fileID: 10910, guid: 0000000000000000f000000000000000, type: 0}
   game: {fileID: 752799949}
-  space: {x: 0, y: 0, z: 0}
 --- !u!114 &752799952
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -784,7 +781,6 @@ MonoBehaviour:
   speed: 1
   snakeSizeScalar: 1
   _directionVector: {x: 0, y: 1, z: 0}
-  NextTile: 0
 --- !u!114 &752799954
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -810,6 +806,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   borderTexture: {fileID: 10906, guid: 0000000000000000f000000000000000, type: 0}
+  game: {fileID: 752799949}
 --- !u!1 &807734552
 GameObject:
   m_ObjectHideFlags: 0

@@ -6,7 +6,7 @@ public class FoodSpawner : MonoBehaviour
     public GameObject Current_food {get; private set;}
     [SerializeField] private Texture2D food_texture;
     [SerializeField] private Game game;
-    [SerializeField] private Vector3 space;
+    private Vector3 space;
     /**
     <summary>
     Function, which generates a food entity to the field within bounds of the game.

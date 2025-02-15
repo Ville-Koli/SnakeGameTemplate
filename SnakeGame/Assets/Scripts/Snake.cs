@@ -14,11 +14,10 @@ public class Snake : MonoBehaviour
         get {return speed;}
         set {speed = value;}
     }
-    public int NextTile = 0;
-
-    public bool IsSnakeHeadGenerated(){
-        return _snakeHead == null;
-    }
+    /**
+    <summary> Function which generates the snake head </summary>
+    <param name="parent"> parent object of the generated snake bodypart </param>
+    **/
     public void GenerateSnakeHead(GameObject parent){
         _snakeHead = new GameObject();
         _snakeHead.name = "snakeHead";
@@ -34,8 +33,9 @@ public class Snake : MonoBehaviour
     /**
     <summary> Function, which updates snake head and its body parts
     and checks for collisions between head and body parts. If collision detected, it sets
-    notCollision to false.
-    </summary>
+    notCollision to false.</summary>
+    <param name="Bounds"> game area bounds </param>
+    <param name="notCollision"> notCollision will be updated to false, whenever snake collides with itself </param>
     **/
     public void UpdateSnake(out bool notCollision, Vector4 Bounds){
         notCollision = true;
@@ -50,39 +50,46 @@ public class Snake : MonoBehaviour
             _snakeBody[i - 1].transform.position = _snakeBody[i].transform.position;
             // check for collision
             if(_snakeHead.transform.position == _snakeBody[i - 1].transform.position
-               && i - 1 != _snakeBody.Count - 1) 
+               && i - 1 != _snakeBody.Count - 1){
                notCollision = false;
-            Vector3 nextTileVector = Logic.KeepInBounds(_snakeHead.transform.position + _directionVector * speed, Bounds);
-            if(nextTileVector == _snakeBody[i - 1].transform.position){
-                NextTile = -1;
+               break;
             }
         }
     }
     /**
     <summary> Function, which returns length of snakes body list </summary>
-    <returns> amount of elements in snake body </returns>**/
+    <returns> amount of elements in snake body </returns>
+    **/
     public int GetSnakeBodyCount(){
         return _snakeBody.Count;
     }
-    public Vector3 GetDirectionVector(){
-        return _directionVector;
-    }
+    /**
+    <summary> Function, which sets the direction vector </summary>
+    <param name="dir"> new direction vector </param>
+    **/
     public void SetDirectionVector(Vector3 dir){
         _directionVector = dir;
     }
-
+    /**
+    <summary> Function, which returns snake heads position </summary>
+    <returns> snake heads position </returns>
+    **/
     public Vector3 GetSnakeHeadPosition(){
         return _snakeHead.transform.position;
     }
-
-    public Vector3 GetNextPosition(){
-        return GetSnakeHeadPosition() + _directionVector * Speed;
-    }
-
+    /**
+    <summary> Function, which sets snake head position to a new position</summary>
+    <param name="position"> new position </param>
+    **/
     public void SetSnakeHeadPosition(Vector3 position){
         _snakeHead.transform.position = position;
     }
-
+    /**
+    <summary> Function, which clears snake body 
+    by destroying all game objects and then clearing 
+    list from invalid references
+    </summary>
+    **/
     public void ClearSnake(){
         foreach(var body in _snakeBody){
             Destroy(body);
@@ -91,11 +98,20 @@ public class Snake : MonoBehaviour
     }
 
     /**
-    <summary> Function which generates a new body part for the snake </summary>**/
+    <summary> Function which generates a new body part for the snake </summary>
+    <param name="parent"> parent object of the generated snake bodypart </param>
+    **/
     public void GenerateSnakeBody(GameObject parent){
         GameObject newBodyPart = Instantiate(_snakeHead);
         newBodyPart.name = "Snake Bodypart " + _snakeBody.Count;
         newBodyPart.transform.SetParent(parent.transform);
         _snakeBody.Add(newBodyPart);
+    }
+    /**
+    <summary> Function, which checks whether snake head has been succesfully generated </summary>
+    <returns> bool, which represents whether snake head is null </returns>
+    **/
+    public bool IsSnakeHeadGenerated(){
+        return _snakeHead == null;
     }
 }

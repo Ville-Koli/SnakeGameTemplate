@@ -6,13 +6,13 @@ using UnityEngine;
 public class Game : MonoBehaviour
 {
     private GameObject parent;
-    [SerializeField] private Snake snake;
+    private float totalTimer = 0f;
+    private int highScore = 0;
     private Dictionary<string, Func<bool>> _inputs = new Dictionary<string, Func<bool>>();
+    [SerializeField] private Snake snake;
     [SerializeField] public Vector4 Bounds;
     [SerializeField] private float updateTimer = 0f;
-    [SerializeField] private float totalTimer = 0f;
     [SerializeField] private bool isGameRunning = true;
-    [SerializeField] private int highScore = 0;
     [SerializeField] private TextMeshProUGUI scoreText;
     [SerializeField] private TextMeshProUGUI highScoreText;
     [SerializeField] private FoodSpawner spawner;
@@ -54,11 +54,10 @@ public class Game : MonoBehaviour
         _inputs.Add("d", () => {snake.SetDirectionVector(new Vector2(1, 0) * snake.Size.x); return true;});
         snake.SetDirectionVector(new Vector2(1, 0) * snake.Size.y); // set to be default direction
         // calculate real bounds
-        Bounds.x *= snake.Size.x;
-        Bounds.y *= snake.Size.y;
-        Bounds.z *= snake.Size.x;
-        Bounds.w *= snake.Size.y;
-        borderGenerator.MakeGameBorders(Bounds, 0.3f, 4f, parent);
+        Bounds.x = (int)(Bounds.x/snake.Size.x) * snake.Size.x;
+        Bounds.y = (int)(Bounds.y/snake.Size.y) * snake.Size.y;
+        Bounds.z = (int)(Bounds.z/snake.Size.x) * snake.Size.x;
+        Bounds.w = (int)(Bounds.w/snake.Size.y) * snake.Size.y;
         // set snake location
         snake.SetSnakeHeadPosition(new Vector3(Bounds.x, Bounds.y));
         highScore = fileEditer.FetchBestHighscore();
@@ -66,17 +65,23 @@ public class Game : MonoBehaviour
         spawner.GenerateFood(parent);
     }
 
-    // Update is called once per frame
-    void Update()
-    {
+    bool HasGameEnded(){
         if(!isGameRunning){
             // set current highscore
             if(snake.GetSnakeBodyCount() > highScore){
                 highScore = snake.GetSnakeBodyCount();
                 highScoreText.text = highScore.ToString();
             }
-            return;
-        } 
+            RestartGame();
+            return true;
+        }
+        return false;
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        if(HasGameEnded()) return;
         totalTimer += Time.deltaTime;
         // input system
         if(_inputs.ContainsKey(Input.inputString))
