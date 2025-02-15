@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 public class QuitButton : MonoBehaviour
 {
-    public Button quit_button;
+    [SerializeField] private Button quit_button;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {

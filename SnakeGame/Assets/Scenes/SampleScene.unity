@@ -207,8 +207,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 310854938}
+  - component: {fileID: 310854939}
   m_Layer: 0
-  m_Name: SnakeGame
+  m_Name: SnakeGames
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -226,11 +227,25 @@ Transform:
   m_LocalPosition: {x: 142.49026, y: 857.1498, z: -0.8277666}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1897765666}
-  - {fileID: 752799950}
+  m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &310854939
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 310854937}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a020dcfe1813dd14c925c58458d8c36b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  snakeGamePrefab: {fileID: 752799948}
+  amount: 10
+  size: 30
+  rowMax: 100
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -676,6 +691,9 @@ GameObject:
   - component: {fileID: 752799949}
   - component: {fileID: 752799951}
   - component: {fileID: 752799952}
+  - component: {fileID: 752799953}
+  - component: {fileID: 752799954}
+  - component: {fileID: 752799955}
   m_Layer: 0
   m_Name: Initializer
   m_TagString: Untagged
@@ -695,19 +713,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0289ed7fa62da242b62db1f7bef988b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  snakeTexture: {fileID: 10910, guid: 0000000000000000f000000000000000, type: 0}
-  borderTexture: {fileID: 10904, guid: 0000000000000000f000000000000000, type: 0}
-  _directionVector: {x: 0, y: 1, z: 0}
-  speed: 1
-  snakeSize: 1
-  bounds: {x: 20, y: 0, z: 60, w: 20}
+  snake: {fileID: 752799953}
+  Bounds: {x: 0, y: 0, z: 20, w: 20}
   updateTimer: 0.3
-  size: {x: 0, y: 0, z: 0}
-  spawner: {fileID: 752799951}
+  totalTimer: 0
   isGameRunning: 1
   highScore: 0
   scoreText: {fileID: 1260226480}
   highScoreText: {fileID: 647397256}
+  spawner: {fileID: 752799951}
+  fileEditer: {fileID: 752799954}
+  borderGenerator: {fileID: 752799955}
 --- !u!4 &752799950
 Transform:
   m_ObjectHideFlags: 0
@@ -717,11 +733,11 @@ Transform:
   m_GameObject: {fileID: 752799948}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -146.47026, y: -859.50977, z: 0.9092398}
+  m_LocalPosition: {x: -3.9799957, y: -2.3599854, z: 0.08147323}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 310854938}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &752799951
 MonoBehaviour:
@@ -735,9 +751,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 597f6b31f64008a4e87941ff687ce505, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  current_food: {fileID: 0}
   food_texture: {fileID: 10910, guid: 0000000000000000f000000000000000, type: 0}
   game: {fileID: 752799949}
+  space: {x: 0, y: 0, z: 0}
 --- !u!114 &752799952
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -751,6 +767,49 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   game: {fileID: 752799949}
+  fileEditer: {fileID: 752799954}
+--- !u!114 &752799953
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 752799948}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c503d89cc57d7fc4ca1ae6a958f28b66, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  snakeTexture: {fileID: 10904, guid: 0000000000000000f000000000000000, type: 0}
+  speed: 1
+  snakeSizeScalar: 1
+  _directionVector: {x: 0, y: 1, z: 0}
+  NextTile: 0
+--- !u!114 &752799954
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 752799948}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14433f12647698b48ae046d2c28f070a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &752799955
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 752799948}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d34f408fa2736c44b19a8048e9e8ef7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  borderTexture: {fileID: 10906, guid: 0000000000000000f000000000000000, type: 0}
 --- !u!1 &807734552
 GameObject:
   m_ObjectHideFlags: 0
@@ -1419,11 +1478,11 @@ Transform:
   m_GameObject: {fileID: 1897765664}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -140.16026, y: -850.3498, z: 0.8277666}
+  m_LocalPosition: {x: 2.3702698, y: 6.6798096, z: 0.000010073185}
   m_LocalScale: {x: 0.23, y: 0.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 310854938}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
@@ -1433,4 +1492,6 @@ SceneRoots:
   - {fileID: 619394802}
   - {fileID: 1013824781}
   - {fileID: 62245615}
+  - {fileID: 752799950}
+  - {fileID: 1897765666}
   - {fileID: 310854938}
