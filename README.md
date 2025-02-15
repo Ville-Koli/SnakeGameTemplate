@@ -10,3 +10,11 @@ This snake game contains:
 
 Known bugs:
     When eating second food the snake does not seem to grow immediately.
+
+
+Future plans:
+    1. Add genetic algorithm to train a neural networks for automatic playing
+    2. Clean code and add comments
+    3. Optimize code
+    4. Make the game look visually better
+    5. Improve main menu ui
