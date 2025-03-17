@@ -209,7 +209,7 @@ GameObject:
   - component: {fileID: 310854938}
   - component: {fileID: 310854939}
   m_Layer: 0
-  m_Name: SnakeGames
+  m_Name: SnakeGamePopulationManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -243,9 +243,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   snakeGamePrefab: {fileID: 752799948}
-  amount: 0
-  size: 30
+  amount: 200
+  size: 15
   rowMax: 10
+  generationTimer: 3
+  inputCooldown: 0.01
+  deadCount: 0
+  writeNetwork: 0
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -603,6 +607,50 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 647397254}
   m_CullTransparentMesh: 1
+--- !u!1 &671081717
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 671081718}
+  - component: {fileID: 671081719}
+  m_Layer: 0
+  m_Name: Tester
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &671081718
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 671081717}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.3284597, y: 1.9517083, z: 0.010198908}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &671081719
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 671081717}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba3f021f3010c674fa0ca3b5ada90882, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &689806707
 GameObject:
   m_ObjectHideFlags: 0
@@ -694,8 +742,10 @@ GameObject:
   - component: {fileID: 752799953}
   - component: {fileID: 752799954}
   - component: {fileID: 752799955}
+  - component: {fileID: 752799956}
+  - component: {fileID: 752799957}
   m_Layer: 0
-  m_Name: Initializer
+  m_Name: GameInitializer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -713,15 +763,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0289ed7fa62da242b62db1f7bef988b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  analysisTimer: 0
+  printData: 0
   snake: {fileID: 752799953}
-  Bounds: {x: 0, y: 0, z: 10, w: 10}
-  updateTimer: 0.3
+  Bounds: {x: 0, y: 0, z: 5, w: 5}
+  updateTimer: 0.001
   isGameRunning: 1
   scoreText: {fileID: 1260226480}
   highScoreText: {fileID: 647397256}
   spawner: {fileID: 752799951}
   fileEditer: {fileID: 752799954}
-  borderGenerator: {fileID: 752799955}
+  pm: {fileID: 310854939}
+  isNextTileSnakeForward: 0
+  isNextTileSnakeLeft: 0
+  isNextTileSnakeRight: 0
 --- !u!4 &752799950
 Transform:
   m_ObjectHideFlags: 0
@@ -780,7 +835,6 @@ MonoBehaviour:
   snakeTexture: {fileID: 10904, guid: 0000000000000000f000000000000000, type: 0}
   speed: 1
   snakeSizeScalar: 1
-  _directionVector: {x: 0, y: 1, z: 0}
 --- !u!114 &752799954
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -807,6 +861,51 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   borderTexture: {fileID: 10906, guid: 0000000000000000f000000000000000, type: 0}
   game: {fileID: 752799949}
+--- !u!114 &752799956
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 752799948}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff0d8946c01628c4da50d2e72507a1e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  data: {fileID: 752799957}
+  snake: {fileID: 752799953}
+  allowPlayerControl: 1
+  recentInputFromPlayer:
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  dataOnInputPress: []
+--- !u!114 &752799957
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 752799948}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 72a442b85972b8349a10a3f7184ed690, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  snake: {fileID: 752799953}
+  spawner: {fileID: 752799951}
+  game: {fileID: 752799949}
+  input_data:
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
 --- !u!1 &807734552
 GameObject:
   m_ObjectHideFlags: 0
@@ -1394,6 +1493,53 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1260226478}
   m_CullTransparentMesh: 1
+--- !u!1 &1588964144
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1588964146}
+  - component: {fileID: 1588964145}
+  m_Layer: 0
+  m_Name: AutoPlayer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1588964145
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1588964144}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb9911ed1427f00408327c023ea630f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  snake: {fileID: 752799953}
+  game: {fileID: 752799949}
+  inputSystem: {fileID: 752799956}
+--- !u!4 &1588964146
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1588964144}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 39.899834, y: -11.07487, z: -0.22023489}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1897765664
 GameObject:
   m_ObjectHideFlags: 0
@@ -1492,3 +1638,5 @@ SceneRoots:
   - {fileID: 752799950}
   - {fileID: 1897765666}
   - {fileID: 310854938}
+  - {fileID: 1588964146}
+  - {fileID: 671081718}

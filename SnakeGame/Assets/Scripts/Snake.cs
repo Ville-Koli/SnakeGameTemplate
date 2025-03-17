@@ -5,15 +5,16 @@ public class Snake : MonoBehaviour
 {
     private List<GameObject> _snakeBody = new List<GameObject>();
     private GameObject _snakeHead;
+    private Vector3 _directionVector = new Vector2(0, 1);
     [SerializeField] private Texture2D snakeTexture;
     [SerializeField] private float speed;
     [SerializeField] private float snakeSizeScalar;
-    [SerializeField] private Vector3 _directionVector = new Vector2(0, 1);
     [SerializeField] public Vector3 Size {get; set;}
     public float Speed {
         get {return speed;}
         set {speed = value;}
     }
+    public Vector3 DirectionVector {get {return _directionVector;}}
     /**
     <summary> Function which generates the snake head </summary>
     <param name="parent"> parent object of the generated snake bodypart </param>
@@ -30,6 +31,7 @@ public class Snake : MonoBehaviour
         sr.sortingOrder = 1;
         Size = sr.bounds.size;
     }
+
     /**
     <summary> Function, which updates snake head and its body parts
     and checks for collisions between head and body parts. If collision detected, it sets
@@ -37,14 +39,19 @@ public class Snake : MonoBehaviour
     <param name="Bounds"> game area bounds </param>
     <param name="notCollision"> notCollision will be updated to false, whenever snake collides with itself </param>
     **/
-    public void UpdateSnake(out bool notCollision, Vector4 Bounds){
+    public void UpdateSnake(out bool notCollision, out int isNextTileSnakeForward, out int isNextTileSnakeLeft, out int isNextTileSnakeRight, Vector4 Bounds){
         notCollision = true;
         if(_snakeBody.Count > 0){
             _snakeBody[^1].transform.position = _snakeHead.transform.position;
         }
         // update snake head
         _snakeHead.transform.position = Logic.KeepInBounds(_snakeHead.transform.position + _directionVector * speed, Bounds);
-
+        Vector3 nextTile = Logic.KeepInBounds(_snakeHead.transform.position + _directionVector * speed, Bounds);
+        Vector3 leftTile = Logic.KeepInBounds(_snakeHead.transform.position + Logic.TurnVectorLeft(_directionVector) * speed, Bounds);
+        Vector3 rightTile = Logic.KeepInBounds(_snakeHead.transform.position + Logic.TurnVectorRight(_directionVector) * speed, Bounds);
+        isNextTileSnakeForward = Logic.IsOutOfBounds(_snakeHead.transform.position + _directionVector * speed * 2, Bounds) ? -1 : 0;
+        isNextTileSnakeLeft = Logic.IsOutOfBounds(_snakeHead.transform.position + Logic.TurnVectorLeft(_directionVector) * speed * 2, Bounds)? -1 : 0;
+        isNextTileSnakeRight = Logic.IsOutOfBounds(_snakeHead.transform.position + Logic.TurnVectorRight(_directionVector) * speed * 2, Bounds) ? -1 : 0;
         // update snake body
         for(int i = 1; i < _snakeBody.Count; ++i){
             _snakeBody[i - 1].transform.position = _snakeBody[i].transform.position;
@@ -52,16 +59,30 @@ public class Snake : MonoBehaviour
             if(_snakeHead.transform.position == _snakeBody[i - 1].transform.position
                && i - 1 != _snakeBody.Count - 1){
                notCollision = false;
-               break;
+            }
+            if(nextTile == _snakeBody[i - 1].transform.position){
+                isNextTileSnakeForward = 1;
+            }
+            if(leftTile == _snakeBody[i - 1].transform.position){
+                isNextTileSnakeLeft = 1;
+            }
+            if(rightTile == _snakeBody[i - 1].transform.position){
+                isNextTileSnakeRight = 1;
             }
         }
     }
+
     /**
     <summary> Function, which returns length of snakes body list </summary>
     <returns> amount of elements in snake body </returns>
     **/
     public int GetSnakeBodyCount(){
         return _snakeBody.Count;
+    }
+    public Vector3 GetTailPosition(){
+        if(_snakeBody.Count > 0)
+            return _snakeBody[^1].transform.position;
+        return Vector3.zero;
     }
     /**
     <summary> Function, which sets the direction vector </summary>

@@ -7,8 +7,10 @@ public class Game : MonoBehaviour
 {
     private GameObject parent;
     private float totalTimer = 0f;
+    public float analysisTimer = 0f;
     private int highScore = 0;
-    private Dictionary<string, Func<bool>> _inputs = new Dictionary<string, Func<bool>>();
+    private List<(float time, float size)> data = new List<(float time, float size)>();
+    public bool printData = false;
     [SerializeField] private Snake snake;
     [SerializeField] public Vector4 Bounds;
     [SerializeField] private float updateTimer = 0f;
@@ -17,26 +19,47 @@ public class Game : MonoBehaviour
     [SerializeField] private TextMeshProUGUI highScoreText;
     [SerializeField] private FoodSpawner spawner;
     [SerializeField] private HighscoreFileEditer fileEditer;
-    [SerializeField] private BorderGenerator borderGenerator;
+    [SerializeField] private PopulationManager pm;
+    public int isNextTileSnakeForward = 0;
+    public int isNextTileSnakeLeft = 0;
+    public int isNextTileSnakeRight = 0;
     public int Highscore {
         get {return highScore;}
     }
-
+    public float UpdateTimer {get {return updateTimer;}}
+    public int[] GetIsNextTileSnake(){
+        return new int[3] {isNextTileSnakeForward, isNextTileSnakeLeft, isNextTileSnakeRight};
+    }
+    /**
+    <summary> Function, which returns the snake </summary>
+    <returns> current snake instance </returns>
+    **/
     public Snake GetSnake(){
         return snake;
     }
+
+    public float GetFitness(){
+        return snake.GetSnakeBodyCount();
+    }
+    /**
+    <summary> Function, which 
+    returns the parent object of all objects related to
+    current instance of the game 
+    </summary>
+    <returns> returns the gameboard object </returns>
+    **/
     public GameObject GetParentObject(){
         return parent;
     }
+    /**
+    <summary> Function, which restarts the game </summary>
+    **/
     public void RestartGame(){
         snake.ClearSnake();
         highScore = 0;
-        snake.SetSnakeHeadPosition(new Vector3(Bounds.x, Bounds.y));
+        analysisTimer = 0f;
+        snake.SetSnakeHeadPosition(new Vector3(Bounds.x, Bounds.y) + snake.Size);
         isGameRunning = true;
-    }
-
-    public bool IsInMarginOfError(Vector3 a, Vector3 b, float error){
-        return Math.Abs((a.x - b.x)/a.x) < error && Math.Abs((a.y - b.y)/a.y) < error;
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -46,25 +69,20 @@ public class Game : MonoBehaviour
         parent = new GameObject(); 
         parent.name = "Gameboard";
         snake.GenerateSnakeHead(parent);
-        // set input system
-        _inputs.Add("", () => {return true;}); // default action
-        _inputs.Add("w", () => {snake.SetDirectionVector(new Vector2(0, 1) * snake.Size.y); return true;});
-        _inputs.Add("s", () => {snake.SetDirectionVector(new Vector2(0, -1) * snake.Size.y); return true;});
-        _inputs.Add("a", () => {snake.SetDirectionVector(new Vector2(-1, 0) * snake.Size.x); return true;});
-        _inputs.Add("d", () => {snake.SetDirectionVector(new Vector2(1, 0) * snake.Size.x); return true;});
-        snake.SetDirectionVector(new Vector2(1, 0) * snake.Size.y); // set to be default direction
-        // calculate real bounds
-        Bounds.x = (int)(Bounds.x/snake.Size.x) * snake.Size.x;
-        Bounds.y = (int)(Bounds.y/snake.Size.y) * snake.Size.y;
-        Bounds.z = (int)(Bounds.z/snake.Size.x) * snake.Size.x;
-        Bounds.w = (int)(Bounds.w/snake.Size.y) * snake.Size.y;
+        // calculate real bounds from bounds
+        Bounds.x = (int)(Bounds.x / snake.Size.x) * snake.Size.x;
+        Bounds.y = (int)(Bounds.y / snake.Size.y) * snake.Size.y;
+        Bounds.z = (int)(Bounds.z / snake.Size.x) * snake.Size.x;
+        Bounds.w = (int)(Bounds.w / snake.Size.y) * snake.Size.y;
         // set snake location
-        snake.SetSnakeHeadPosition(new Vector3(Bounds.x, Bounds.y));
+        snake.SetSnakeHeadPosition(new Vector3(Bounds.x, Bounds.y) + snake.Size);
         highScore = fileEditer.FetchBestHighscore();
         highScoreText.text = highScore.ToString();  
         spawner.GenerateFood(parent);
     }
-
+    /**
+    <summary> Function, which checks whether game has ended and restarts the game if it has ended</summary>
+    **/
     bool HasGameEnded(){
         if(!isGameRunning){
             // set current highscore
@@ -72,7 +90,7 @@ public class Game : MonoBehaviour
                 highScore = snake.GetSnakeBodyCount();
                 highScoreText.text = highScore.ToString();
             }
-            RestartGame();
+            //RestartGame();
             return true;
         }
         return false;
@@ -81,22 +99,32 @@ public class Game : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(HasGameEnded()) return;
+        if(printData){
+            string dataString = "";
+            foreach(var elem in data){
+                dataString += $"({(int)elem.time}, {elem.size}), ";
+            }
+            Debug.Log(dataString);
+            printData = false;
+        }
+        if(HasGameEnded()){
+            return;
+        }
         totalTimer += Time.deltaTime;
-        // input system
-        if(_inputs.ContainsKey(Input.inputString))
-            _inputs[Input.inputString]();
+        analysisTimer += Time.deltaTime;
         // update snake
         if(totalTimer > updateTimer){
-            snake.UpdateSnake(out isGameRunning, Bounds);
+            snake.UpdateSnake(out isGameRunning, out isNextTileSnakeForward, out isNextTileSnakeLeft, out isNextTileSnakeRight, Bounds);
             totalTimer -= updateTimer;
         }
         // snake eating the food logic
-        if(spawner.Current_food != null && IsInMarginOfError(snake.GetSnakeHeadPosition(), spawner.Current_food.transform.position, 0.0005f)){
+        if(spawner.Current_food != null && Logic.IsInMarginOfError(snake.GetSnakeHeadPosition(), spawner.Current_food.transform.position, 0.0005f)){
             snake.GenerateSnakeBody(parent);
             Destroy(spawner.Current_food);
             spawner.GenerateFood(parent);
             scoreText.text = snake.GetSnakeBodyCount().ToString();
+            data.Add((analysisTimer, snake.GetSnakeBodyCount()));
         }
+        if(!isGameRunning){ pm.deadCount += 1; }
     }
 }
